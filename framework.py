@@ -24,9 +24,18 @@ def addRecord():
 			values += "\'" + storeData + "\' "
 		else:
 			values += "\'" + storeData + "\', "
+	try:
+		cursor.execute("INSERT INTO {} VALUES ({})".format(tableName, values))
+		connection.commit()
+		if cursor.rowcount >= 1:
+			print("Insertion successful.")
+		else:
+			print("Error while Insertion.")
 
-	cursor.execute("INSERT INTO {} VALUES ({})".format(tableName, values))
-	connection.commit()
+		print("\n{} Number of row(s) affected".format(cursor.rowcount))
+
+	except Exception as e:
+		print("Error ", e)
 
 def readRecords():
 
