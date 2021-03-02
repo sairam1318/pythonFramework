@@ -63,7 +63,7 @@ def updateRecord():
 		if cursor.rowcount >= 1:
 			print("Updation successful.")
 		else:
-			print("Updation Error")
+			print("Error while Updation.")
 
 		print("\n{} Number of row(s) affected".format(cursor.rowcount))
 
@@ -76,8 +76,13 @@ def deleteRecord():
 	try:
 		cursor.execute("UPDATE {} SET {} = '0' WHERE {} = '{}' ".format(tableName, fields[-1], fields[0], dataToBeDeleted))
 		connection.commit()
+		if cursor.rowcount == 1:
+			print("\nDeletion successful.")
+		else:
+			print("Error while Deletion.")
+
 		print("\n{} Number of row(s) affected".format(cursor.rowcount))
-		print("\nDeletion successful.")
+
 
 	except Exception as e:
 		print("Error ", e)
