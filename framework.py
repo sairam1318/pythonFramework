@@ -47,15 +47,21 @@ def addRecord():
 def readRecords():
 
 	records = cursor.execute("SELECT * FROM {}".format(tableName))
+	deletedRecords = []
 
 	for data in records:
 
 		if data[-1] == '0':
-			pass 
+			deletedRecords.append(data) 
 		else:
 			print("\n")
 			for item in data:
 				print(item + " ", end = " ")
+	print("\n\nDeleted Records are: ")
+	for data in deletedRecords:
+		print("\n")
+		for item in data:
+			print(item + " ", end = " ")
 
 
 def updateRecord():
