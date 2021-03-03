@@ -10,10 +10,15 @@ fields = []
 
 def getFields():
 
-	metadata = cursor.execute("PRAGMA TABLE_INFO({})".format(tableName))
-	for field in metadata:
-		fields.append(field[1])
-	
+	cursor.execute("SELECT count(name) FROM sqlite_master WHERE type = 'table' and name = '{}' ".format(tableName))
+	if (cursor.fetchone()[0] == 1):
+		metadata = cursor.execute("PRAGMA TABLE_INFO({})".format(tableName))
+		for field in metadata:
+			fields.append(field[1])
+
+	else:
+		print("\nNo Table Named {} in database {}".format(tableName, dataBaseName))
+		exit()
 
 def addRecord():
 
@@ -30,12 +35,14 @@ def addRecord():
 		if cursor.rowcount >= 1:
 			print("Insertion successful.")
 		else:
-			print("Error while Insertion.")
+			print("Insertion unsuccessful.")
 
 		print("\n{} Number of row(s) affected".format(cursor.rowcount))
 
 	except Exception as e:
 		print("Error ", e)
+		connection.rollback()
+		
 
 def readRecords():
 
@@ -67,17 +74,19 @@ def updateRecord():
 
 	try:
 		updateData = input("Enter {} to update: ".format(fields[choice]))
-		cursor.execute("UPDATE {} SET {} = '{}' WHERE {} = '{}' ".format(tableName, fields[choice], updateData, fields[0], dataToBeUpdated))
+		cursor.execute("UPDATE {} SET {} = '{}' WHERE {} = '{}' AND STATUS = 1".format(tableName, fields[choice], updateData, fields[0], dataToBeUpdated))
 		connection.commit()
 		if cursor.rowcount >= 1:
 			print("Updation successful.")
 		else:
-			print("Error while Updation.")
+			print(dataToBeUpdated + " not found.")
 
 		print("\n{} Number of row(s) affected".format(cursor.rowcount))
 
 	except Exception as e:
 		print("Error ", e)
+		connection.rollback()
+		peinr("Updation failed.")
 	
 def deleteRecord():
 	dataToBeDeleted = input("Enter " + fields[0].lower() + " to be deleted: ")
@@ -88,16 +97,18 @@ def deleteRecord():
 		if cursor.rowcount == 1:
 			print("\nDeletion successful.")
 		else:
-			print("Error while Deletion.")
+			print(dataToBeDeleted + " is not found")
 
 		print("\n{} Number of row(s) affected".format(cursor.rowcount))
 
-
 	except Exception as e:
 		print("Error ", e)
+		connection.rollback()
+		print("Deletion failed.")
 
 
 def exitMenu():
+	connection.commit()
 	connection.close()
 	print("\nThank You.")
 	exit()
